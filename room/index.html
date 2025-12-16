@@ -1,0 +1,668 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      html, body {
+        background-color: #000;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden !important;
+      }
+
+      #crosshair {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  border: 1px solid #fff;
+  border-radius: 50%;
+  opacity: 0.0; /*0.5*/
+}
+
+.noise {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.noise::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23noise)' opacity='0.3'/%3E%3C/svg%3E");
+}
+
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10000;
+
+  background-image: radial-gradient(
+    ellipse at center,
+    #0000 40%,
+    #0009 100%
+  );
+}
+
+* {
+  font-family: "Comic Sans MS", cursive;
+}
+
+
+#counter {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 20px;
+  letter-spacing: 2px;
+  opacity: 0.0; /*.85*/
+  pointer-events: none;
+  z-index: 10001;
+}
+
+#startScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20000;
+  color: white;
+}
+
+#startText {
+  text-align: center;
+  max-width: 600px;
+  padding: 40px;
+}
+
+#startText p {
+  margin: 14px 0;
+  line-height: 1.6;
+  font-size: 18px;
+}
+
+#winScreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 30000;
+  color: white;
+}
+
+#winText {
+  text-align: center;
+  max-width: 600px;
+  padding: 40px;
+}
+
+#winText h1 {
+  margin-bottom: 25px;
+  letter-spacing: 6px;
+  font-size: 64px;
+}
+
+#winText p {
+  margin: 14px 0;
+  line-height: 1.6;
+  font-size: 18px;
+}
+
+  </style>
+
+<body>
+  <audio id="bgm" src="bgm.mp3" loop></audio>
+
+
+  <div id="crosshair"></div>
+  <div class="noise"></div>
+  <div class="vignette"></div>
+  <div id="counter">0 / 3</div>
+  <div id="startScreen">
+    <div id="startText">
+      <h1>Where is the Star? Dream Editon</h1>
+  
+      <p>
+        Find and collect the three objects:<br>
+        <b>Snake, Train, and Cake</b>
+      </p>
+  
+      <p>
+        When all three are collected,<br>
+        a <b>Star</b> will appear.
+      </p>
+  
+      <p>
+        <b>Controls</b><br>
+        WASD — Move<br>
+        Mouse — Look<br>
+        Space / Shift — Up / Down<br>
+        Click — Interact
+      </p>
+  
+      <p>Click ANYWHERE TO START!</p>
+    </div>
+  </div>
+
+  <div id="winScreen">
+    <div id="winText">
+      <h1>YOU WIN!</h1>
+  
+      <p>
+        You found the hidden star!
+      </p>
+  
+      <p>
+        Refresh Page to Explore Again...
+      </p>
+    </div>
+  </div>
+</body>
+
+
+    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@latest/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@latest/examples/jsm/"
+      }
+    }
+    </script>
+    <script type="module">
+      import * as THREE from 'three';
+      import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+      let renderer, scene, camera;
+
+      let flickerLight;
+
+      const spotClock = new THREE.Clock();
+      let spotLight1, spotLight2, spotLight3;
+      const spotTargets = [];
+
+      let isLocked = false;
+
+
+      let controls;
+      let move = {
+        forward: false,
+        backward: false,
+        left: false,
+        right: false,
+        up: false,
+        down: false
+      };
+
+      const speed = 0.4;
+
+      let gameStarted = false;
+
+
+      let collectedCount = 0;
+const totalCollectibles = 3;
+
+function updateCounter() {
+  if (collectedCount === totalCollectibles) {
+    document.getElementById('counter').textContent =
+    "All Items Found! Find the hidden star!";
+  }
+  
+  else {
+    document.getElementById('counter').textContent =
+    collectedCount + " / " + totalCollectibles;
+  }
+}
+
+  document.addEventListener('keydown', (e) => {
+  switch (e.code) {
+    case 'KeyW': move.forward = true; break;
+    case 'KeyS': move.backward = true; break;
+    case 'KeyA': move.left = true; break;
+    case 'KeyD': move.right = true; break;
+    case 'Space': move.up = true; break;
+    case 'ShiftLeft': move.down = true; break;
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  switch (e.code) {
+    case 'KeyW': move.forward = false; break;
+    case 'KeyS': move.backward = false; break;
+    case 'KeyA': move.left = false; break;
+    case 'KeyD': move.right = false; break;
+    case 'Space': move.up = false; break;
+    case 'ShiftLeft': move.down = false; break;
+  }
+});
+
+
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+
+
+window.onload = () => {
+scene = new THREE.Scene();
+camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+camera.position.set(0, 0, 20); //spawn location
+
+controls = new PointerLockControls(camera, document.body);
+scene.add(controls.object);
+
+renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// center 'light'
+const cubeGeometry = new THREE.BoxGeometry(5, 1, 5);
+const cubeMaterial = new THREE.MeshBasicMaterial({ color: 0xfff5b6 });
+const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+cube.position.set(0, 10, 0);
+scene.add(cube);
+
+// lighting
+scene.add(new THREE.AmbientLight(0x808080, 0.5));
+flickerLight = new THREE.PointLight(0xfff5b6, 10, 0, 1);
+flickerLight.position.set(0, 5, 0);
+scene.add(flickerLight);
+
+const pointLight1 = new THREE.PointLight(0x89cff0, 10, 0, 1);
+pointLight1.position.set(-56.25, 5, 56.25);
+scene.add(pointLight1);
+
+const pointLight2 = new THREE.PointLight(0xffffff, 20, 0, 1);
+pointLight2.position.set(56.25, 5, 56.25);
+scene.add(pointLight2);
+
+// SPOTLIGHT FOR PARTY ROOM
+spotLight1 = new THREE.SpotLight(0xff0000, 200, 100, Math.PI / 8, 0.3, 1);
+spotLight1.position.set(-45, 15, -45);
+spotLight1.target.position.set(-50, 0, -35);
+scene.add(spotLight1);
+scene.add(spotLight1.target);
+
+spotLight2 = new THREE.SpotLight(0x00ff00, 200, 100, Math.PI / 8, 0.3, 1);
+spotLight2.position.set(-45, 15, -45);
+spotLight2.target.position.set(-40, 0, -40);
+scene.add(spotLight2);
+scene.add(spotLight2.target);
+
+spotLight3 = new THREE.SpotLight(0x0000ff, 200, 100, Math.PI / 8, 0.3, 1);
+spotLight3.position.set(-45, 15, -45);
+spotLight3.target.position.set(-35, 0, -50);
+scene.add(spotLight3);
+scene.add(spotLight3.target);
+
+spotTargets.push(
+  { light: spotLight1, a: new THREE.Vector3(-50, 0, -35), b: new THREE.Vector3(-35, 0, -50), speed: 1.2 },
+  { light: spotLight2, a: new THREE.Vector3(-40, 0, -40), b: new THREE.Vector3(-60, 0, -60), speed: 1.5 },
+  { light: spotLight3, a: new THREE.Vector3(-35, 0, -50), b: new THREE.Vector3(-50, 0, -35), speed: 0.4 }
+);
+
+// sharp spotlight in party
+const spotLight4 = new THREE.SpotLight(0xffffff, 100, 100, Math.PI / 9, 0, 1);
+spotLight4.position.set(-45, 15, -45);
+spotLight4.target.position.set(-47.5, 0, -47.5);
+scene.add(spotLight4);
+scene.add(spotLight4.target);
+
+// sharp spotlight in sponge
+const spotLight5 = new THREE.SpotLight(0xffffff, 100, 100, Math.PI / 9, 0, 1);
+spotLight5.position.set(65, 15, -65);
+spotLight5.target.position.set(65, 0, -65);
+scene.add(spotLight5);
+scene.add(spotLight5.target);
+
+
+
+// load textures
+const loaderTex = new THREE.TextureLoader();
+
+const wallTex = loaderTex.load("wall.jpg");
+
+// ground/ceiling textures
+const checkeredTex = loaderTex.load("checkered.png");
+const lavaTex = loaderTex.load("lava.jpg");
+const cloudTex = loaderTex.load("cloud.png");
+const marbleTex = loaderTex.load("marble.png");
+
+const carpetTex = loaderTex.load("carpet.jpg");
+const tileTex = loaderTex.load("tile.jpg");
+
+// wall textures
+const playTex = loaderTex.load("play.jpg");
+const partyTex = loaderTex.load("party.jpg");
+const greyTex = loaderTex.load("grey.jpg");
+const fireTex = loaderTex.load("fire.jpg");
+
+// constant repeated pattern
+checkeredTex.wrapS = checkeredTex.wrapT = THREE.RepeatWrapping;
+lavaTex.wrapS = lavaTex.wrapT = THREE.RepeatWrapping;
+cloudTex.wrapS = cloudTex.wrapT = THREE.RepeatWrapping;
+marbleTex.wrapS = marbleTex.wrapT = THREE.RepeatWrapping;
+carpetTex.wrapS = carpetTex.wrapT = THREE.RepeatWrapping;
+tileTex.wrapS = tileTex.wrapT = THREE.RepeatWrapping;
+playTex.wrapS = playTex.wrapT = THREE.RepeatWrapping;
+partyTex.wrapS = partyTex.wrapT = THREE.RepeatWrapping;
+greyTex.wrapS = greyTex.wrapT = THREE.RepeatWrapping;
+fireTex.wrapS = fireTex.wrapT = THREE.RepeatWrapping;
+
+checkeredTex.repeat.set(4, 4);
+lavaTex.repeat.set(5,5);
+cloudTex.repeat.set(3, 3);
+marbleTex.repeat.set(5, 5);
+carpetTex.repeat.set(10, 10);
+tileTex.repeat.set(10, 10);
+playTex.repeat.set(75 / 15, 20 / 15);
+partyTex.repeat.set(75 / 15, 20 / 15);
+greyTex.repeat.set(75 / 15, 20 / 15);
+fireTex.repeat.set(2, 1);
+
+// floors/ceilings
+
+function createFloor(x, y, z, material, size = 0, rotationX = 0) {
+    const floorGeometry = new THREE.PlaneGeometry(size, size);
+    const floorMaterial = material;
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.position.set(x, y, z);
+    floor.rotation.x = rotationX;
+
+    scene.add(floor);
+}
+
+createFloor(-37.5, -10, -37.5, new THREE.MeshStandardMaterial({ map: checkeredTex }), 75, -Math.PI / 2);
+createFloor(-37.5, 10, -37.5, new THREE.MeshStandardMaterial({ map: greyTex }), 75, Math.PI / 2);
+createFloor(37.5, -10, -37.5, new THREE.MeshStandardMaterial({ map: lavaTex }), 75, -Math.PI / 2);
+createFloor(37.5, 10, -37.5, new THREE.MeshStandardMaterial({ map: lavaTex }), 75, Math.PI / 2);
+createFloor(-37.5, -10, 37.5, new THREE.MeshStandardMaterial({ map: cloudTex }), 75, -Math.PI / 2);
+createFloor(-37.5, 10, 37.5, new THREE.MeshStandardMaterial({ map: cloudTex }), 75, Math.PI / 2);
+createFloor(37.5, -10, 37.5, new THREE.MeshStandardMaterial({ map: marbleTex }), 75, -Math.PI / 2);
+createFloor(37.5, 10, 37.5, new THREE.MeshStandardMaterial({ map: marbleTex }), 75, Math.PI / 2);
+createFloor(0, -9.99, 0, new THREE.MeshStandardMaterial({ map: carpetTex }), 55, -Math.PI / 2);
+createFloor(0, 9.99, 0, new THREE.MeshStandardMaterial({ map: tileTex }), 55, Math.PI / 2);
+
+
+
+// outermost walls
+function createWall(x, y, z, material, rotationY = 0) {
+    const wallGeometry = new THREE.PlaneGeometry(75, 20);
+    const wallMaterial = material;
+
+    const wall = new THREE.Mesh(wallGeometry, wallMaterial);
+    wall.position.set(x, y, z);
+    wall.rotation.y = rotationY;
+    scene.add(wall);
+  }
+
+createWall(-37.5, 0, -75, new THREE.MeshStandardMaterial({ map: partyTex }));
+createWall(37.5, 0, -75, new THREE.MeshStandardMaterial({ map: fireTex }));
+createWall(75, 0, -37.5, new THREE.MeshStandardMaterial({ map: fireTex }), Math.PI/-2);
+createWall(75, 0, 37.5, new THREE.MeshStandardMaterial({ map: greyTex }), Math.PI/-2);
+createWall(37.5, 0, 75, new THREE.MeshStandardMaterial({ map: greyTex }), Math.PI);
+createWall(-37.5, 0, 75, new THREE.MeshStandardMaterial({ map: playTex }), Math.PI);
+createWall(-75, 0, 37.5, new THREE.MeshStandardMaterial({ map: playTex }), Math.PI/2);
+createWall(-75, 0, -37.5, new THREE.MeshStandardMaterial({ map: partyTex }), Math.PI/2);
+
+// center pillars
+const pillarTex = wallTex.clone();
+pillarTex.wrapS = pillarTex.wrapT = THREE.RepeatWrapping;
+pillarTex.repeat.set(1, 5);
+
+const pillarGeometry = new THREE.BoxGeometry(5, 20, 5);
+const pillarMaterial = new THREE.MeshStandardMaterial({ map: pillarTex });
+
+function createPillar(x = 0, y = 0, z = 0) {
+  const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+  pillar.position.set(x, y, z);
+  scene.add(pillar);
+}
+
+createPillar(-10, 0, -10);
+createPillar(10, 0, -10);
+createPillar(-10, 0, 10);
+createPillar(10, 0, 10);
+
+
+// block room seperators
+const blockTex = wallTex.clone();
+blockTex.wrapS = blockTex.wrapT = THREE.RepeatWrapping;
+blockTex.repeat.set(15, 5);
+
+const blockGeometry = new THREE.BoxGeometry(5, 20, 42.5);
+const blockMaterial = new THREE.MeshStandardMaterial({ map: blockTex });
+
+function createBlock(x, y, z, rotationY = 0) {
+  const block = new THREE.Mesh(blockGeometry, blockMaterial);
+  block.position.set(x, y, z);
+  block.rotation.y = rotationY;
+  scene.add(block);
+}
+
+createBlock(-30, 0, 0);
+createBlock(30, 0, 0);
+createBlock(0, 0, 53.75);
+createBlock(0, 0, -53.75);
+createBlock(0, 0, 30, Math.PI / 2);
+createBlock(0, 0, -30, Math.PI / 2);
+createBlock(-53.75, 0, 0, Math.PI / 2);
+createBlock(53.75, 0, 0, Math.PI / 2);
+
+
+// load GLB models
+const gltfLoader = new GLTFLoader();
+
+// spread elements
+const loadModel = (path, position, scale, rotation, onLoad) => {
+  gltfLoader.load(path, (gltf) => {
+    const model = gltf.scene;
+    model.position.set(...position);
+    model.scale.set(...scale);
+    model.rotation.set(...rotation);
+    scene.add(model);
+    if (onLoad) onLoad(model);
+  });
+};
+
+// interactive models
+let starObject;
+let snakeObject, trainObject, cakeObject;
+
+const collected = {
+  snake: false,
+  train: false,
+  cake: false
+};
+
+// art room
+loadModel('painting1.glb', [74.5, -7, 10], [15, 15, 15], [0, Math.PI / -2, 0]);
+loadModel('painting2.glb', [74.8, 0, 40], [3, 3, 3], [0, Math.PI / -2, 0]);
+loadModel('painting3.glb', [74.5, 0, 60], [6, 6, 6], [0, Math.PI / -2, 0]);
+loadModel('painting4.glb', [30, 12, 74.6], [15, 15, 15], [0, Math.PI, 0]);
+loadModel('painting5.glb', [60, -39, 130.1], [0.9, 0.9, 0.9], [0, Math.PI, 0]);
+loadModel('snake.glb', [50, -10, 50], [1, 1, 1], [0, 0, 0], (model) => {
+  snakeObject = model;
+});
+
+// play room
+loadModel('rail.glb', [-50, -9.59, 50], [50, 50, 50], [0, Math.PI / -2, 0]);
+loadModel('rail.glb', [-50, -9.6, 50], [50, 50, 50], [0, 0, 0]);
+loadModel('hoop.glb', [-50, -25, 75], [1000, 1000, 1000], [0, Math.PI, 0]);
+loadModel('ramp.glb', [-53.7, -9.6, 30], [0.7, 0.93, 0.93], [0, Math.PI / -2, 0]);
+loadModel('abacus.glb', [-9, -5, 40], [1, 1, 1], [0, Math.PI / 4, 0]);
+loadModel('blocks.glb', [-12, 22, 102], [30, 30, 30], [0, Math.PI / -12, 0]);
+loadModel('train.glb', [-54, -2, 73], [40, 40, 40], [Math.PI / -2, 0, Math.PI / -12], (model) => {
+  trainObject = model;
+});
+
+// party room
+loadModel('table.glb', [-20, -10, -60], [5, 5, 5], [0, Math.PI / 12, 0]);
+loadModel('table.glb', [-50, -10, -50], [5, 5, 5], [0, Math.PI / -2, 0]);
+loadModel('table.glb', [-40, -10, -30], [5, 5, 5], [0, Math.PI / 4, 0]);
+loadModel('table.glb', [-55, -10, -15], [5, 5, 5], [0, Math.PI / -6, 0]);
+loadModel('spiderman.glb', [-72, -10, -25], [0.55, 0.55, 0.55], [0, Math.PI / 1.6, 0]);
+loadModel('tv.glb', [-74.5, 9, -10], [11, 11, 11], [0, Math.PI / 2, 0]);
+loadModel('sign.glb', [-54.5, 0.3, -60], [6, 6, 6], [0, Math.PI - 4.25, 0]);
+loadModel('cake.glb', [-50, -4.8, -50], [0.02, 0.02, 0.02], [0, Math.PI / -2, 0], (model) => {
+  cakeObject = model;
+});
+
+// randomly rotate drinks upon load
+const drinkPositions = [
+  [-54.5, -10, -60],
+  [-34.5, -10, -40],
+  [-64.5, -10, -20]
+];
+drinkPositions.forEach(pos => {
+  loadModel('drink.glb', pos, [6, 6, 6], [0, Math.random() * Math.PI * 2, 0]);
+});
+
+// sponge room
+loadModel('spongebob1.glb', [64, -5, -65], [12, 12, 12], [0, 5.5, 0]);
+loadModel('star.glb', [65, -5, -65], [0.05, 0.05, 0.05], [0, 5.5, 0], (model) => {
+  starObject = model;
+  starObject.visible = false;
+});
+
+function checkWinUnlock() {
+  if (collected.snake && collected.train && collected.cake) {
+    if (starObject) {
+      starObject.visible = true;
+    }
+  }
+}
+
+// allows certain models to click as intended
+function isDescendant(child, parent) {
+  let obj = child;
+  while (obj) {
+    if (obj === parent) return true;
+    obj = obj.parent;
+  }
+  return false;
+}
+
+function showWinText() {
+  document.getElementById('winScreen').style.display = 'flex';
+  controls.unlock();
+}
+
+document.addEventListener('click', () => {
+  if (!gameStarted) {
+    document.getElementById('startScreen').style.display = 'none';
+    gameStarted = true;
+    controls.lock();
+
+    const music = document.getElementById('bgm');
+    if (music) {
+      music.volume = 0.3;
+      music.play();
+    }
+    return;
+  }
+
+  if (!controls.isLocked) {
+    controls.lock();
+    return;
+  }
+
+  raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+
+  const targets = [snakeObject, trainObject, cakeObject, starObject].filter(Boolean);
+  const hits = raycaster.intersectObjects(targets, true);
+  if (hits.length === 0) return;
+
+  const hit = hits[0].object;
+
+  // count up the 3 models to unlock star
+  if (snakeObject && snakeObject.visible && isDescendant(hit, snakeObject)) {
+      collected.snake = true;
+      collectedCount++;
+      updateCounter();
+      snakeObject.visible = false;
+      checkWinUnlock();
+    return;
+  }
+
+  if (trainObject && trainObject.visible && isDescendant(hit, trainObject)) {
+      collected.train = true;
+      collectedCount++;
+      updateCounter();
+      trainObject.visible = false;
+      checkWinUnlock();
+    return;
+  }
+
+  if (cakeObject && cakeObject.visible && isDescendant(hit, cakeObject)) {
+      collected.cake = true;
+      collectedCount++;
+      updateCounter();
+      cakeObject.visible = false;
+      checkWinUnlock();
+    return;
+  }
+
+  if (starObject && starObject.visible && isDescendant(hit, starObject)) {
+    showWinText();
+  }
+});
+
+  animate();
+};
+
+// center light flicker
+function flicker() {
+  flickerLight.intensity = Math.random()/2 + 3;
+}
+
+// party room smooth lerp lights
+function animateSpotlights() {
+  const t = spotClock.getElapsedTime();
+
+  spotTargets.forEach(({ light, a, b, speed }) => {
+    const alpha = (Math.sin(t * speed) + 1) / 2; // 0 → 1 → 0
+
+    light.target.position.lerpVectors(a, b, alpha);
+    light.target.updateMatrixWorld();
+  });
+}
+
+
+  function animate() {
+  requestAnimationFrame(animate);
+
+  if (controls.isLocked && gameStarted) {
+    if (move.forward) controls.moveForward(speed);
+    if (move.backward) controls.moveForward(-speed);
+    if (move.left) controls.moveRight(-speed);
+    if (move.right) controls.moveRight(speed);
+    if (move.up) controls.object.position.y += speed;
+    if (move.down) controls.object.position.y -= speed;
+
+  }
+
+  flicker();
+  animateSpotlights();
+
+  renderer.render(scene, camera);
+}
+    </script>
+  </head>
+</html>
