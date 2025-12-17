@@ -1,7 +1,7 @@
 # Where is the Star? Dream Edition
 **Welcome to the Dream Space…**
 
-<img src="room/img/room.gif" alt="Dream Room" width="100%">
+<img src="https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/room.gif" width="100%">
 
 # Description
 *Where is the Star? Dream Edition* is an interactive experience based on liminal spaces. Explore the various rooms to find the key items and unlock the hidden star! Will you be able to find the hidden star?
@@ -11,15 +11,15 @@ To try out the experience, please visit this link! https://tkhuu-umb.github.io/c
 
 # Visuals
 ### Art Room
-![](room/img/ss1.png)
+![Art Room](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/ss1.png)
 ### Play Room
-![](room/img/ss2.png)
+![Play Room](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/ss2.png)
 ### Party Room
-![](room/img/ss3.png)
+![Party Room](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/ss3.png)
 ### ???
-![](room/img/ss4.png)
+![Scary Room](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/ss4.png)
 ### Back Room
-![](room/img/ss5.png)
+![Back Room](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/ss5.png)
 
 
 # Known Issues
@@ -67,4 +67,4 @@ All models featured in this scene were sourced from **[Sketchfab](https://sketch
 
 ### Thank You!
 Final thanks to **Daniel Haehn** and the **[CS460](https://cs460.org/)** teaching staff for their dedication to teaching/assisting the course. I learned a great deal of new and engaging material, and I was able to apply much of what I learned directly to this project.
-![](room/img/cs460.jpeg)
+![](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/cs460.jpeg)
