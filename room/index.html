@@ -336,22 +336,22 @@ scene.add(spotLight5.target);
 // load textures
 const loaderTex = new THREE.TextureLoader();
 
-const wallTex = loaderTex.load("wall.jpg");
+const wallTex = loaderTex.load("textures/wall.jpg");
 
 // ground/ceiling textures
-const checkeredTex = loaderTex.load("checkered.png");
-const lavaTex = loaderTex.load("lava.jpg");
-const cloudTex = loaderTex.load("cloud.png");
-const marbleTex = loaderTex.load("marble.png");
+const checkeredTex = loaderTex.load("textures/checkered.png");
+const lavaTex = loaderTex.load("textures/lava.jpg");
+const cloudTex = loaderTex.load("textures/cloud.png");
+const marbleTex = loaderTex.load("textures/marble.png");
 
-const carpetTex = loaderTex.load("carpet.jpg");
-const tileTex = loaderTex.load("tile.jpg");
+const carpetTex = loaderTex.load("textures/carpet.jpg");
+const tileTex = loaderTex.load("textures/tile.jpg");
 
 // wall textures
-const playTex = loaderTex.load("play.jpg");
-const partyTex = loaderTex.load("party.jpg");
-const greyTex = loaderTex.load("grey.jpg");
-const fireTex = loaderTex.load("fire.jpg");
+const playTex = loaderTex.load("textures/play.jpg");
+const partyTex = loaderTex.load("textures/party.jpg");
+const greyTex = loaderTex.load("textures/grey.jpg");
+const fireTex = loaderTex.load("textures/fire.jpg");
 
 // constant repeated pattern
 checkeredTex.wrapS = checkeredTex.wrapT = THREE.RepeatWrapping;
@@ -492,35 +492,35 @@ const collected = {
 };
 
 // art room
-loadModel('painting1.glb', [74.5, -7, 10], [15, 15, 15], [0, Math.PI / -2, 0]);
-loadModel('painting2.glb', [74.8, 0, 40], [3, 3, 3], [0, Math.PI / -2, 0]);
-loadModel('painting3.glb', [74.5, 0, 60], [6, 6, 6], [0, Math.PI / -2, 0]);
-loadModel('painting4.glb', [30, 12, 74.6], [15, 15, 15], [0, Math.PI, 0]);
-loadModel('painting5.glb', [60, -39, 130.1], [0.9, 0.9, 0.9], [0, Math.PI, 0]);
-loadModel('snake.glb', [50, -10, 50], [1, 1, 1], [0, 0, 0], (model) => {
+loadModel('models/painting1.glb', [74.5, -7, 10], [15, 15, 15], [0, Math.PI / -2, 0]);
+loadModel('models/painting2.glb', [74.8, 0, 40], [3, 3, 3], [0, Math.PI / -2, 0]);
+loadModel('models/painting3.glb', [74.5, 0, 60], [6, 6, 6], [0, Math.PI / -2, 0]);
+loadModel('models/painting4.glb', [30, 12, 74.6], [15, 15, 15], [0, Math.PI, 0]);
+loadModel('models/painting5.glb', [60, -39, 130.1], [0.9, 0.9, 0.9], [0, Math.PI, 0]);
+loadModel('models/snake.glb', [50, -10, 50], [1, 1, 1], [0, 0, 0], (model) => {
   snakeObject = model;
 });
 
 // play room
-loadModel('rail.glb', [-50, -9.59, 50], [50, 50, 50], [0, Math.PI / -2, 0]);
-loadModel('rail.glb', [-50, -9.6, 50], [50, 50, 50], [0, 0, 0]);
-loadModel('hoop.glb', [-50, -25, 75], [1000, 1000, 1000], [0, Math.PI, 0]);
-loadModel('ramp.glb', [-53.7, -9.6, 30], [0.7, 0.93, 0.93], [0, Math.PI / -2, 0]);
-loadModel('abacus.glb', [-9, -5, 40], [1, 1, 1], [0, Math.PI / 4, 0]);
-loadModel('blocks.glb', [-12, 22, 102], [30, 30, 30], [0, Math.PI / -12, 0]);
-loadModel('train.glb', [-54, -2, 73], [40, 40, 40], [Math.PI / -2, 0, Math.PI / -12], (model) => {
+loadModel('models/rail.glb', [-50, -9.59, 50], [50, 50, 50], [0, Math.PI / -2, 0]);
+loadModel('models/rail.glb', [-50, -9.6, 50], [50, 50, 50], [0, 0, 0]);
+loadModel('models/hoop.glb', [-50, -25, 75], [1000, 1000, 1000], [0, Math.PI, 0]);
+loadModel('models/ramp.glb', [-53.7, -9.6, 30], [0.7, 0.93, 0.93], [0, Math.PI / -2, 0]);
+loadModel('models/abacus.glb', [-9, -5, 40], [1, 1, 1], [0, Math.PI / 4, 0]);
+loadModel('models/blocks.glb', [-12, 22, 102], [30, 30, 30], [0, Math.PI / -12, 0]);
+loadModel('models/train.glb', [-54, -2, 73], [40, 40, 40], [Math.PI / -2, 0, Math.PI / -12], (model) => {
   trainObject = model;
 });
 
 // party room
-loadModel('table.glb', [-20, -10, -60], [5, 5, 5], [0, Math.PI / 12, 0]);
-loadModel('table.glb', [-50, -10, -50], [5, 5, 5], [0, Math.PI / -2, 0]);
-loadModel('table.glb', [-40, -10, -30], [5, 5, 5], [0, Math.PI / 4, 0]);
-loadModel('table.glb', [-55, -10, -15], [5, 5, 5], [0, Math.PI / -6, 0]);
-loadModel('spiderman.glb', [-72, -10, -25], [0.55, 0.55, 0.55], [0, Math.PI / 1.6, 0]);
-loadModel('tv.glb', [-74.5, 9, -10], [11, 11, 11], [0, Math.PI / 2, 0]);
-loadModel('sign.glb', [-54.5, 0.3, -60], [6, 6, 6], [0, Math.PI - 4.25, 0]);
-loadModel('cake.glb', [-50, -4.8, -50], [0.02, 0.02, 0.02], [0, Math.PI / -2, 0], (model) => {
+loadModel('models/table.glb', [-20, -10, -60], [5, 5, 5], [0, Math.PI / 12, 0]);
+loadModel('models/table.glb', [-50, -10, -50], [5, 5, 5], [0, Math.PI / -2, 0]);
+loadModel('models/table.glb', [-40, -10, -30], [5, 5, 5], [0, Math.PI / 4, 0]);
+loadModel('models/table.glb', [-55, -10, -15], [5, 5, 5], [0, Math.PI / -6, 0]);
+loadModel('models/spiderman.glb', [-72, -10, -25], [0.55, 0.55, 0.55], [0, Math.PI / 1.6, 0]);
+loadModel('models/tv.glb', [-74.5, 9, -10], [11, 11, 11], [0, Math.PI / 2, 0]);
+loadModel('models/sign.glb', [-54.5, 0.3, -60], [6, 6, 6], [0, Math.PI - 4.25, 0]);
+loadModel('models/cake.glb', [-50, -4.8, -50], [0.02, 0.02, 0.02], [0, Math.PI / -2, 0], (model) => {
   cakeObject = model;
 });
 
@@ -531,12 +531,12 @@ const drinkPositions = [
   [-64.5, -10, -20]
 ];
 drinkPositions.forEach(pos => {
-  loadModel('drink.glb', pos, [6, 6, 6], [0, Math.random() * Math.PI * 2, 0]);
+  loadModel('models/drink.glb', pos, [6, 6, 6], [0, Math.random() * Math.PI * 2, 0]);
 });
 
 // sponge room
-loadModel('spongebob1.glb', [64, -5, -65], [12, 12, 12], [0, 5.5, 0]);
-loadModel('star.glb', [65, -5, -65], [0.05, 0.05, 0.05], [0, 5.5, 0], (model) => {
+loadModel('models/spongebob1.glb', [64, -5, -65], [12, 12, 12], [0, 5.5, 0]);
+loadModel('models/star.glb', [65, -5, -65], [0.05, 0.05, 0.05], [0, 5.5, 0], (model) => {
   starObject = model;
   starObject.visible = false;
 });
