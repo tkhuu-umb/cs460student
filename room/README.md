@@ -90,6 +90,6 @@ Sourced from various locations.
 **[Noise](https://www.reddit.com/r/css/comments/1jiyvwd/how_to_add_a_noise_effect/)**
 **[Three.js](https://threejs.org/docs/)**
 
-### Thank You!
+# Thank You!
 Final thanks to **Daniel Haehn** and the **[CS460](https://cs460.org/)** teaching staff for their dedication to teaching/assisting the course. I learned a great deal of new and engaging material, and I was able to apply much of what I learned directly to this project.
 ![](https://raw.githubusercontent.com/tkhuu-umb/cs460student/main/room/img/cs460.jpeg)
