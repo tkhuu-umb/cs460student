@@ -62,8 +62,29 @@ All models featured in this scene were sourced from **[Sketchfab](https://sketch
 * Wooden Toy Train with Trailer | Locomotive Train - JaaLyy
 * TV - CN Entertainment
 
+### Textures
+Sourced from various locations.
+
+* Brown carpeting texture seamless 16552 - Sketchup Texture
+* Dama Checkerboard Porcelain Tiles - MMG Tile & Stone
+* Modern and classy seamless abstract spiral pattern vector illustration Free Vector - Vecteezy
+* Seamless Sky Texture - Pinterest
+* Seamless texture - the fire of Hell in the background. stock photo - iStock
+* Dark grey asphalt. seamless tileable background. - Freepik
+* evil ground - Filter Forge
+* white marble floor - Shutterstock
+* Party Wall Party Time - Spoonflower
+* Cute seamless pattern for kids Background - Vecteezy
+* Pale Yellow Floral Tile, Stack - Architextures
+* backrooms level 0 wall texture - Reddit
+
 ### Music Credits
 **[Mita! Where are you?](https://www.youtube.com/watch?v=hW-iaX07eBQ)** - MakenCat
+
+#### Other useful sources that aided me...
+**[Vignette](https://dev.to/debadeepsen/vintage-photo-effect-with-css-16oj)**
+**[Noise](https://www.reddit.com/r/css/comments/1jiyvwd/how_to_add_a_noise_effect/)**
+**[Three.js](https://threejs.org/docs/)**
 
 ### Thank You!
 Final thanks to **Daniel Haehn** and the **[CS460](https://cs460.org/)** teaching staff for their dedication to teaching/assisting the course. I learned a great deal of new and engaging material, and I was able to apply much of what I learned directly to this project.
