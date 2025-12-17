@@ -31,6 +31,10 @@ Occasionally, when multiple keys are pressed at once and then released, it may f
 
 If you switch browsers or press **ESC**, your cursor will become unlocked from the experience. To reattach it, simply **Left-Click** anywhere inside the window to lock back in.
 
+> *I can go through the walls. Is that intentional?*
+
+Why yes of course! This is supposed to be a **Dream Space**...
+
 
 # Future Improvements
 - Sound effects
